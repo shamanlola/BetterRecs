@@ -65,11 +65,7 @@ public sealed class RecommendationService
 
         // Per-section settings derived from the saved config: smaller result count,
         // and the home-section-specific watched / cross-type toggles applied on top.
-        var sectionConfig = config.Clone();
-        sectionConfig.MaxResults        = Math.Max(1, config.HomeSectionItemCount);
-        sectionConfig.MinResults        = Math.Min(config.MinResults, sectionConfig.MaxResults);
-        sectionConfig.ExcludeWatched    = !config.RecommendWatchedItems;
-        sectionConfig.SameMediaTypeOnly = !config.CrossTypeRecommendations;
+        var sectionConfig = BuildSectionConfig(config);
 
         var sections = new List<RecommendationSection>(sources.Count);
 
@@ -104,6 +100,92 @@ public sealed class RecommendationService
             sections.Count, userId);
 
         return sections;
+    }
+
+    /// <summary>
+    /// Builds a single blended recommendation row: it draws matches from several of
+    /// the user's recently-played titles and interleaves them into one de-duplicated
+    /// list. Used by the Home Screen Sections (HSS) integration, which renders one
+    /// statically-titled row rather than a row per source title.
+    /// </summary>
+    public IReadOnlyList<BaseItem> GetCombinedRecommendations(Guid userId, PluginConfiguration config)
+    {
+        if (!config.HomeSectionsEnabled)
+            return [];
+
+        var user = _userManager.GetUserById(userId);
+        if (user is null)
+        {
+            _logger.LogWarning("BetterRecs: combined recommendations requested for unknown user {UserId}", userId);
+            return [];
+        }
+
+        var sources = PickSourceItems(user, config);
+        if (sources.Count == 0)
+            return [];
+
+        var blendCount    = Math.Clamp(config.HomeSectionBlendCount, 1, sources.Count);
+        var itemCount     = Math.Max(1, config.HomeSectionItemCount);
+        var sectionConfig = BuildSectionConfig(config);
+
+        // Pull each source's matches (already ordered best-first) into its own queue.
+        var queues = new List<Queue<BaseItem>>(blendCount);
+        foreach (var source in sources.Take(blendCount))
+        {
+            var similar = _similarityService.GetSimilarItems(source.Id, userId, sectionConfig);
+            if (similar.Count > 0)
+                queues.Add(new Queue<BaseItem>(similar));
+        }
+
+        if (queues.Count == 0)
+            return [];
+
+        var sourcesUsed = queues.Count;
+
+        // Round-robin interleave so every source contributes roughly equally while
+        // each source's own ranking is preserved. Skip the source titles themselves
+        // and any item already taken from another source's list.
+        var seen   = new HashSet<Guid>(sources.Select(s => s.Id));
+        var merged = new List<BaseItem>(itemCount);
+
+        while (merged.Count < itemCount && queues.Count > 0)
+        {
+            for (var i = 0; i < queues.Count && merged.Count < itemCount; i++)
+            {
+                var queue = queues[i];
+
+                // Advance this queue to its next not-yet-used item.
+                while (queue.Count > 0)
+                {
+                    var candidate = queue.Dequeue();
+                    if (seen.Add(candidate.Id)) { merged.Add(candidate); break; }
+                }
+            }
+
+            // Drop exhausted queues so the loop can terminate.
+            queues.RemoveAll(q => q.Count == 0);
+        }
+
+        _logger.LogDebug(
+            "BetterRecs: built blended home row of {Count} items from {Sources} sources for user {UserId}",
+            merged.Count, sourcesUsed, userId);
+
+        return merged;
+    }
+
+    /// <summary>
+    /// Derives a per-row configuration from the saved settings: a smaller result
+    /// count, and the home-section-specific watched / cross-type toggles applied on
+    /// top. The clone keeps the saved configuration untouched.
+    /// </summary>
+    private static PluginConfiguration BuildSectionConfig(PluginConfiguration config)
+    {
+        var sectionConfig = config.Clone();
+        sectionConfig.MaxResults        = Math.Max(1, config.HomeSectionItemCount);
+        sectionConfig.MinResults        = Math.Min(config.MinResults, sectionConfig.MaxResults);
+        sectionConfig.ExcludeWatched    = !config.RecommendWatchedItems;
+        sectionConfig.SameMediaTypeOnly = !config.CrossTypeRecommendations;
+        return sectionConfig;
     }
 
     /// <summary>

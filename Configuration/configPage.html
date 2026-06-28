@@ -151,6 +151,12 @@
                         Personalised recommendation rows built from titles you recently watched, served
                         from <code>GET /BetterRecs/Recommendations?userId=&lt;id&gt;</code>. Each row reuses
                         the scoring engine configured above.
+                        <br /><br />
+                        To show these on the home screen, install the
+                        <strong>Home Screen Sections (HSS)</strong> plugin. BetterRecs registers a single
+                        blended row with HSS at startup, combining matches from several recently-watched
+                        titles under the heading set below. (The per-title "Number of rows" setting only
+                        applies to the raw API endpoint, which front-ends like KefinTweaks can also consume.)
                     </p>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -159,7 +165,7 @@
                             <span>Enable "Because you watched …" rows</span>
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">
-                            When off, the recommendations endpoint returns nothing.
+                            When off, the recommendations endpoint returns nothing and no row is registered with HSS.
                         </div>
                     </div>
 
@@ -173,6 +179,24 @@
                         <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionItemCount">Items per row</label>
                         <input id="inpHomeSectionItemCount" type="number" min="1" max="50" is="emby-input" />
                         <div class="fieldDescription">How many recommended items to show in each row.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionTitle">Home-screen row title (HSS)</label>
+                        <input id="inpHomeSectionTitle" type="text" is="emby-input" />
+                        <div class="fieldDescription">
+                            Heading for the blended row injected into the home screen via the Home Screen
+                            Sections plugin. Takes effect on the next server restart.
+                        </div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionBlendCount">Titles blended per home row (HSS)</label>
+                        <input id="inpHomeSectionBlendCount" type="number" min="1" max="50" is="emby-input" />
+                        <div class="fieldDescription">
+                            How many recently-watched titles are combined into the single HSS home row.
+                            Each contributes its top matches; results are merged, de-duplicated and interleaved.
+                        </div>
                     </div>
 
                     <div class="inputContainer">
@@ -329,6 +353,8 @@
             document.getElementById('chkHomeSectionsEnabled').checked           = config.HomeSectionsEnabled;
             document.getElementById('inpHomeSectionCount').value                = config.HomeSectionCount;
             document.getElementById('inpHomeSectionItemCount').value            = config.HomeSectionItemCount;
+            document.getElementById('inpHomeSectionTitle').value                = config.HomeSectionTitle;
+            document.getElementById('inpHomeSectionBlendCount').value           = config.HomeSectionBlendCount;
             document.getElementById('inpRecentlyWatchedPoolSize').value         = config.RecentlyWatchedPoolSize;
             document.getElementById('chkHomeSectionShuffleSources').checked     = config.HomeSectionShuffleSources;
             document.getElementById('chkRecommendWatchedItems').checked         = config.RecommendWatchedItems;
@@ -361,6 +387,8 @@
                 HomeSectionsEnabled:           document.getElementById('chkHomeSectionsEnabled').checked,
                 HomeSectionCount:          parseInt(document.getElementById('inpHomeSectionCount').value, 10),
                 HomeSectionItemCount:      parseInt(document.getElementById('inpHomeSectionItemCount').value, 10),
+                HomeSectionTitle:              document.getElementById('inpHomeSectionTitle').value,
+                HomeSectionBlendCount:     parseInt(document.getElementById('inpHomeSectionBlendCount').value, 10),
                 RecentlyWatchedPoolSize:   parseInt(document.getElementById('inpRecentlyWatchedPoolSize').value, 10),
                 HomeSectionShuffleSources:     document.getElementById('chkHomeSectionShuffleSources').checked,
                 RecommendWatchedItems:         document.getElementById('chkRecommendWatchedItems').checked,

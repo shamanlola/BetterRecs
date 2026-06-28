@@ -73,6 +73,17 @@ public class PluginConfiguration : BasePluginConfiguration
     // How many recommended items to put in each row.
     public int HomeSectionItemCount { get; set; } = 12;
 
+    // Heading for the row injected into the home screen via the Home Screen Sections
+    // (HSS) plugin. That integration renders a single blended row, so it carries a
+    // static title rather than a per-source "Because you watched X" one.
+    public string HomeSectionTitle { get; set; } = "Recommended for You";
+
+    // How many of the user's recently-played titles are blended together to build
+    // the single HSS home row. Each contributes its top matches; the results are
+    // merged, de-duplicated and interleaved so the row reflects several things the
+    // user watched rather than just the most recent one.
+    public int HomeSectionBlendCount { get; set; } = 5;
+
     // The pool of most-recently-played items to draw the "X" source titles from.
     // A few are picked (optionally at random — see HomeSectionShuffleSources) so the
     // rows vary instead of always being the single most recent title.

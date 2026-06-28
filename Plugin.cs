@@ -29,9 +29,10 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 
     public override string Description =>
         "Better recommendations for Jellyfin. Replaces the built-in Similar Items with a " +
-        "multi-dimensional weighted scoring engine, and adds personalised \"Because you watched …\" " +
-        "rows for the home screen. Matches on genres, tags, ratings, release year, and cast/crew. " +
-        "Fully configurable.";
+        "multi-dimensional weighted scoring engine, and serves personalised \"Because you watched …\" " +
+        "rows via the /BetterRecs/Recommendations API. When the Home Screen Sections (HSS) plugin is " +
+        "installed, it also adds a blended \"Recommended for You\" row to the home screen. " +
+        "Matches on genres, tags, ratings, release year, and cast/crew. Fully configurable.";
 
     public IEnumerable<PluginPageInfo> GetPages()
     {
