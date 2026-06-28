@@ -60,11 +60,11 @@ jobs:
           pip install jprm --quiet
           ZIP=$(ls artifacts/*.zip | head -1)
           if [ ! -f manifest.json ]; then
-            echo "[]" > manifest.json
+            jprm repo init .
           fi
           jprm repo add \
             --url "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/" \
-            manifest.json "$ZIP"
+            . "$ZIP"
 
       - name: Commit Manifest
         run: |
