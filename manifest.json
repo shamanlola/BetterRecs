@@ -11,7 +11,7 @@
                 "version": "2.0.0.0",
                 "changelog": "Renamed to BetterRecs. Added 'Because you watched ...' personalised recommendation sections, exposed via the /BetterRecs/Recommendations API, with full configuration (section count, items per section, recommend-watched, cross-type movie/series recommendations). Added Home Screen Sections (HSS) integration: when the HSS plugin is installed, BetterRecs registers a single blended 'Recommended for You' row on the home screen, combining matches from several recently-watched titles.",
                 "targetAbi": "10.11.0.0",
-                "sourceUrl": "https://github.com/shamanlola/BetterRecs/releases/download/v2.0.0/betterrecs/betterrecs_2.0.0.0.zip",
+                "sourceUrl": "https://github.com/shamanlola/BetterRecs/releases/download/v2.0.0/betterrecs_2.0.0.0.zip",
                 "checksum": "935a4a2a9f556aab6a034fc08b6d97b6",
                 "timestamp": "2026-06-28T22:06:45Z"
             }

@@ -58,13 +58,17 @@ jobs:
       - name: Update Plugin Manifest
         run: |
           pip install jprm --quiet
-          ZIP=$(ls artifacts/*.zip | head -1)
+          # Flatten any subdirectory that download-artifact may have created
+          ZIP=$(find artifacts/ -name "*.zip" | head -1)
+          ZIPNAME=$(basename "$ZIP")
+          cp "$ZIP" "$ZIPNAME"
           if [ ! -f manifest.json ]; then
             jprm repo init .
           fi
           jprm repo add \
             --url "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/" \
-            . "$ZIP"
+            . "$ZIPNAME"
+          rm "$ZIPNAME"
 
       - name: Commit Manifest
         run: |
