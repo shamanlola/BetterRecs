@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BetterRecs</title>
+</head>
+<body>
+<div data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-scroller">
+    <div data-role="content">
+        <div class="content-primary">
+
+            <form id="BetterRecsConfigForm">
+
+                <!-- ── Enable / Disable ─────────────────────────────────── -->
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label class="emby-checkbox-label">
+                        <input id="chkEnabled" type="checkbox" is="emby-checkbox" />
+                        <span>Enable BetterRecs</span>
+                    </label>
+                    <div class="fieldDescription checkboxFieldDescription">
+                        When disabled, Jellyfin's default Similar Items behaviour is restored and no
+                        recommendation rows are served.
+                    </div>
+                </div>
+
+                <!-- ── Scoring Weights ──────────────────────────────────── -->
+                <div class="verticalSection verticalSection-extrabottompadding">
+                    <div class="sectionTitleContainer">
+                        <h2 class="sectionTitle">Scoring Weights</h2>
+                    </div>
+                    <p class="fieldDescription">
+                        Each dimension contributes to the similarity score proportionally to its weight.
+                        Set a weight to 0 to disable that dimension entirely.
+                    </p>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpGenreWeight">Genre weight (0–100)</label>
+                        <input id="inpGenreWeight" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">How strongly shared genres influence the score.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpTagWeight">Tag weight (0–100)</label>
+                        <input id="inpTagWeight" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">How strongly shared tags influence the score.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpCommunityRatingWeight">Community rating weight (0–100)</label>
+                        <input id="inpCommunityRatingWeight" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">Prefer items with a similar audience score (0–10 scale).</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpParentalRatingWeight">Parental rating weight (0–100)</label>
+                        <input id="inpParentalRatingWeight" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">Prefer items with a similar content rating (G → NC-17 / TV-Y → TV-MA).</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpYearWeight">Release year weight (0–100)</label>
+                        <input id="inpYearWeight" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">Prefer items from around the same era.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpPeopleWeight">Cast &amp; crew weight (0–100)</label>
+                        <input id="inpPeopleWeight" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">Prefer items sharing directors or top-billed actors (see Advanced).</div>
+                    </div>
+                </div>
+
+                <!-- ── Filters ──────────────────────────────────────────── -->
+                <div class="verticalSection verticalSection-extrabottompadding">
+                    <div class="sectionTitleContainer">
+                        <h2 class="sectionTitle">Filters</h2>
+                    </div>
+                    <p class="fieldDescription">
+                        Items that fail these filters are excluded entirely, regardless of their score.
+                    </p>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpMaxCommunityRatingDistance">Max community rating distance (0–10)</label>
+                        <input id="inpMaxCommunityRatingDistance" type="number" min="0" max="10" step="0.5" is="emby-input" />
+                        <div class="fieldDescription">
+                            Exclude items whose audience score differs by more than this amount.
+                            E.g. 3 means a 7.5-rated film will not suggest a 4.0-rated one.
+                        </div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpMaxParentalRatingDistance">Max parental rating distance (0–5)</label>
+                        <input id="inpMaxParentalRatingDistance" type="number" min="0" max="5" is="emby-input" />
+                        <div class="fieldDescription">
+                            Steps on the rating ladder: G=0 PG=1 PG-13=3 R=4 NC-17=5 / TV-Y=0 … TV-MA=5.
+                            2 = a PG-13 film will not suggest NC-17.
+                        </div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpMinGenreMatches">Min shared genres</label>
+                        <input id="inpMinGenreMatches" type="number" min="0" max="10" is="emby-input" />
+                        <div class="fieldDescription">Candidates must share at least this many genres. 0 disables this filter.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpMinTagMatches">Min shared tags</label>
+                        <input id="inpMinTagMatches" type="number" min="0" max="20" is="emby-input" />
+                        <div class="fieldDescription">Candidates must share at least this many tags. 0 disables this filter.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="chkExcludeWatched" type="checkbox" is="emby-checkbox" />
+                            <span>Exclude already-watched items</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            Hide items the requesting user has already marked as played.
+                        </div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="chkSameMediaTypeOnly" type="checkbox" is="emby-checkbox" />
+                            <span>Same media type only</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            Don't mix movies and TV series in the results.
+                        </div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="chkRelaxFilters" type="checkbox" is="emby-checkbox" />
+                            <span>Relax filters when too few results</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            If fewer than Min Results pass all filters, automatically loosen genre, tag,
+                            and rating constraints until enough candidates are found.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── "Because you watched …" home rows ────────────────── -->
+                <div class="verticalSection verticalSection-extrabottompadding">
+                    <div class="sectionTitleContainer">
+                        <h2 class="sectionTitle">"Because you watched …" home rows</h2>
+                    </div>
+                    <p class="fieldDescription">
+                        Personalised recommendation rows built from titles you recently watched, served
+                        from <code>GET /BetterRecs/Recommendations?userId=&lt;id&gt;</code>. Each row reuses
+                        the scoring engine configured above.
+                    </p>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="chkHomeSectionsEnabled" type="checkbox" is="emby-checkbox" />
+                            <span>Enable "Because you watched …" rows</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            When off, the recommendations endpoint returns nothing.
+                        </div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionCount">Number of rows</label>
+                        <input id="inpHomeSectionCount" type="number" min="1" max="20" is="emby-input" />
+                        <div class="fieldDescription">How many "Because you watched X" rows to produce.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionItemCount">Items per row</label>
+                        <input id="inpHomeSectionItemCount" type="number" min="1" max="50" is="emby-input" />
+                        <div class="fieldDescription">How many recommended items to show in each row.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpRecentlyWatchedPoolSize">Recently-watched pool size</label>
+                        <input id="inpRecentlyWatchedPoolSize" type="number" min="1" max="100" is="emby-input" />
+                        <div class="fieldDescription">
+                            How many of your most recently played titles to draw the row sources from.
+                            A larger pool gives more variety when shuffling is enabled.
+                        </div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="chkHomeSectionShuffleSources" type="checkbox" is="emby-checkbox" />
+                            <span>Rotate row sources</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            Pick the source titles at random from the recent pool so the rows rotate over
+                            time. When off, your most recent titles are always used in order.
+                        </div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="chkRecommendWatchedItems" type="checkbox" is="emby-checkbox" />
+                            <span>Recommend already-watched items</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            Allow titles you've already played to appear inside the rows. Off by default so
+                            rows surface things you haven't seen.
+                        </div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="chkCrossTypeRecommendations" type="checkbox" is="emby-checkbox" />
+                            <span>Recommend across movies and TV</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            Let a movie's row include TV series and vice versa. When off, each row only
+                            contains the same media type as its source title.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Results ──────────────────────────────────────────── -->
+                <div class="verticalSection verticalSection-extrabottompadding">
+                    <div class="sectionTitleContainer">
+                        <h2 class="sectionTitle">Results</h2>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpMinResults">Min results</label>
+                        <input id="inpMinResults" type="number" min="1" max="25" is="emby-input" />
+                        <div class="fieldDescription">Target minimum number of results (triggers filter relaxation if enabled).</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpMaxResults">Max results</label>
+                        <input id="inpMaxResults" type="number" min="1" max="50" is="emby-input" />
+                        <div class="fieldDescription">Maximum number of items returned.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpRandomness">Randomness / discovery (0–100)</label>
+                        <input id="inpRandomness" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">
+                            0 = purely deterministic (best match always first). 100 = highly exploratory:
+                            random noise is added to scores so lower-ranked items can occasionally surface.
+                            Tip: 15–30 gives a nice mix of relevance and discovery.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Advanced ─────────────────────────────────────────── -->
+                <div class="verticalSection verticalSection-extrabottompadding">
+                    <div class="sectionTitleContainer">
+                        <h2 class="sectionTitle">Advanced</h2>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpMaxYearGap">Max year gap (for year scoring)</label>
+                        <input id="inpMaxYearGap" type="number" min="1" max="100" is="emby-input" />
+                        <div class="fieldDescription">
+                            Items further apart than this many years score 0 on the year dimension.
+                            Does not exclude them; only affects their year score.
+                        </div>
+                    </div>
+
+                    <div class="selectContainer">
+                        <label class="selectLabel" for="selPeopleMatch">Cast &amp; crew matching</label>
+                        <select id="selPeopleMatch" is="emby-select">
+                            <option value="None">Disabled</option>
+                            <option value="DirectorsOnly">Directors only</option>
+                            <option value="DirectorsAndActors">Directors + top actors</option>
+                        </select>
+                        <div class="fieldDescription">Which people to include when computing cast/crew overlap.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpTopActorCount">Top-billed actors to consider</label>
+                        <input id="inpTopActorCount" type="number" min="1" max="20" is="emby-input" />
+                        <div class="fieldDescription">Only relevant when "Directors + top actors" is selected above.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpIndexRefreshMinutes">Index refresh interval (minutes)</label>
+                        <input id="inpIndexRefreshMinutes" type="number" min="1" max="1440" is="emby-input" />
+                        <div class="fieldDescription">
+                            How often the background similarity index is rebuilt. It also rebuilds
+                            automatically when your library changes, so this is just a staleness cap.
+                            Changes to cast/crew matching take effect on the next rebuild.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Save ─────────────────────────────────────────────── -->
+                <div>
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>Save</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        var pluginId = 'd3a7e2b1-4c9f-4e8a-b5d6-2f1c8e3a7b9d';
+
+        function loadConfig(config) {
+            document.getElementById('chkEnabled').checked                       = config.Enabled;
+            document.getElementById('inpGenreWeight').value                     = config.GenreWeight;
+            document.getElementById('inpTagWeight').value                       = config.TagWeight;
+            document.getElementById('inpCommunityRatingWeight').value           = config.CommunityRatingWeight;
+            document.getElementById('inpParentalRatingWeight').value            = config.ParentalRatingWeight;
+            document.getElementById('inpYearWeight').value                      = config.YearWeight;
+            document.getElementById('inpPeopleWeight').value                    = config.PeopleWeight;
+            document.getElementById('inpMaxCommunityRatingDistance').value      = config.MaxCommunityRatingDistance;
+            document.getElementById('inpMaxParentalRatingDistance').value       = config.MaxParentalRatingDistance;
+            document.getElementById('inpMinGenreMatches').value                 = config.MinGenreMatches;
+            document.getElementById('inpMinTagMatches').value                   = config.MinTagMatches;
+            document.getElementById('chkExcludeWatched').checked               = config.ExcludeWatched;
+            document.getElementById('chkSameMediaTypeOnly').checked             = config.SameMediaTypeOnly;
+            document.getElementById('chkRelaxFilters').checked                  = config.RelaxFiltersWhenTooFewResults;
+            document.getElementById('inpMinResults').value                      = config.MinResults;
+            document.getElementById('inpMaxResults').value                      = config.MaxResults;
+            document.getElementById('inpRandomness').value                      = config.Randomness;
+            document.getElementById('inpMaxYearGap').value                      = config.MaxYearGap;
+            document.getElementById('selPeopleMatch').value                     = config.PeopleMatch;
+            document.getElementById('inpTopActorCount').value                   = config.TopActorCount;
+            document.getElementById('inpIndexRefreshMinutes').value             = config.IndexRefreshMinutes;
+            document.getElementById('chkHomeSectionsEnabled').checked           = config.HomeSectionsEnabled;
+            document.getElementById('inpHomeSectionCount').value                = config.HomeSectionCount;
+            document.getElementById('inpHomeSectionItemCount').value            = config.HomeSectionItemCount;
+            document.getElementById('inpRecentlyWatchedPoolSize').value         = config.RecentlyWatchedPoolSize;
+            document.getElementById('chkHomeSectionShuffleSources').checked     = config.HomeSectionShuffleSources;
+            document.getElementById('chkRecommendWatchedItems').checked         = config.RecommendWatchedItems;
+            document.getElementById('chkCrossTypeRecommendations').checked      = config.CrossTypeRecommendations;
+        }
+
+        function collectConfig() {
+            return {
+                Enabled:                       document.getElementById('chkEnabled').checked,
+                GenreWeight:               parseInt(document.getElementById('inpGenreWeight').value, 10),
+                TagWeight:                 parseInt(document.getElementById('inpTagWeight').value, 10),
+                CommunityRatingWeight:     parseInt(document.getElementById('inpCommunityRatingWeight').value, 10),
+                ParentalRatingWeight:      parseInt(document.getElementById('inpParentalRatingWeight').value, 10),
+                YearWeight:                parseInt(document.getElementById('inpYearWeight').value, 10),
+                PeopleWeight:              parseInt(document.getElementById('inpPeopleWeight').value, 10),
+                MaxCommunityRatingDistance: parseFloat(document.getElementById('inpMaxCommunityRatingDistance').value),
+                MaxParentalRatingDistance: parseInt(document.getElementById('inpMaxParentalRatingDistance').value, 10),
+                MinGenreMatches:           parseInt(document.getElementById('inpMinGenreMatches').value, 10),
+                MinTagMatches:             parseInt(document.getElementById('inpMinTagMatches').value, 10),
+                ExcludeWatched:                document.getElementById('chkExcludeWatched').checked,
+                SameMediaTypeOnly:             document.getElementById('chkSameMediaTypeOnly').checked,
+                RelaxFiltersWhenTooFewResults: document.getElementById('chkRelaxFilters').checked,
+                MinResults:                parseInt(document.getElementById('inpMinResults').value, 10),
+                MaxResults:                parseInt(document.getElementById('inpMaxResults').value, 10),
+                Randomness:                parseInt(document.getElementById('inpRandomness').value, 10),
+                MaxYearGap:                parseInt(document.getElementById('inpMaxYearGap').value, 10),
+                PeopleMatch:                   document.getElementById('selPeopleMatch').value,
+                TopActorCount:             parseInt(document.getElementById('inpTopActorCount').value, 10),
+                IndexRefreshMinutes:       parseInt(document.getElementById('inpIndexRefreshMinutes').value, 10),
+                HomeSectionsEnabled:           document.getElementById('chkHomeSectionsEnabled').checked,
+                HomeSectionCount:          parseInt(document.getElementById('inpHomeSectionCount').value, 10),
+                HomeSectionItemCount:      parseInt(document.getElementById('inpHomeSectionItemCount').value, 10),
+                RecentlyWatchedPoolSize:   parseInt(document.getElementById('inpRecentlyWatchedPoolSize').value, 10),
+                HomeSectionShuffleSources:     document.getElementById('chkHomeSectionShuffleSources').checked,
+                RecommendWatchedItems:         document.getElementById('chkRecommendWatchedItems').checked,
+                CrossTypeRecommendations:      document.getElementById('chkCrossTypeRecommendations').checked,
+            };
+        }
+
+        Dashboard.showLoadingMsg();
+        ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+            loadConfig(config);
+            Dashboard.hideLoadingMsg();
+        });
+
+        document.getElementById('BetterRecsConfigForm')
+            .addEventListener('submit', function (e) {
+                e.preventDefault();
+                Dashboard.showLoadingMsg();
+                ApiClient.updatePluginConfiguration(pluginId, collectConfig()).then(function () {
+                    Dashboard.processPluginConfigurationUpdateResult();
+                });
+            });
+    }());
+    </script>
+
+</div>
+</body>
+</html>

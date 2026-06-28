@@ -1,0 +1,19 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Build output
+dist/
+*.zip
+BetterRecs/
+
+## Rider / VS Code
+.idea/
+.vscode/
+*.DotSettings
+
+## macOS
+.DS_Store
