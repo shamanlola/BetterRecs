@@ -1,0 +1,38 @@
+name: Build Plugin
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Build Plugin
+        uses: oddstr13/jellyfin-plugin-repository-manager@v1.1.1
+        id: jprm
+        with:
+          dotnet-target: net9.0
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: ${{ steps.jprm.outputs.artifact }}
+          retention-days: 30
+          if-no-files-found: error
