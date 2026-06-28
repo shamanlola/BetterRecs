@@ -84,6 +84,19 @@ Returns personalised *"Because you watched …"* sections for the current user. 
 
 ---
 
+## Creating a Release
+
+Push a version tag to trigger the release workflow — it will build the plugin, create a GitHub Release, and attach the zip and checksums automatically:
+
+```bash
+git tag v2.0.0
+git push origin v2.0.0
+```
+
+The release appears under the [Releases](https://github.com/shamanlola/BetterRecs/releases) tab once the workflow finishes.
+
+---
+
 ## Build from Source
 
 Requirements: [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)

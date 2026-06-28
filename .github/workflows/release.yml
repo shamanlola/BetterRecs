@@ -1,10 +1,12 @@
 name: Publish Release
 
 on:
-  release:
-    types:
-      - released
-  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -32,25 +34,42 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-  upload:
+  release:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
+          path: artifacts/
 
-      - name: Generate Checksums
-        run: |
-          for file in ./*.zip; do
-            md5sum "${file#./}" >> "${file%.zip}.md5"
-            sha256sum "${file#./}" >> "${file%.zip}.sha256"
-          done
-          ls -l
-
-      - name: Upload Release Assets
-        uses: shogo82148/actions-upload-release-asset@v1
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./*
+          files: artifacts/*
+          generate_release_notes: true
+
+      - name: Update Plugin Manifest
+        run: |
+          pip install jprm --quiet
+          ZIP=$(ls artifacts/*.zip | head -1)
+          if [ ! -f manifest.json ]; then
+            echo "[]" > manifest.json
+          fi
+          jprm repo add \
+            --url "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/" \
+            manifest.json "$ZIP"
+
+      - name: Commit Manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git diff --cached --quiet || git commit -m "chore: update manifest for ${{ github.ref_name }}"
+          git push origin HEAD:main
