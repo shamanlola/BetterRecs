@@ -1,7 +1,7 @@
 ---
 name: "BetterRecs"
 guid: "d3a7e2b1-4c9f-4e8a-b5d6-2f1c8e3a7b9d"
-version: 2.1.0.0
+version: 2.1.1.0
 targetAbi: "10.11.0.0"
 framework: net9.0
 owner: "shamanlola"
@@ -11,4 +11,4 @@ category: "General"
 artifacts:
   - "Jellyfin.Plugin.BetterRecs.dll"
 changelog: |-
-  Home Screen Sections (HSS) integration is now functional: BetterRecs registers a single blended 'Recommended for You' row that combines the top matches from several recently-watched titles and rebuilds on every home-screen refresh. Reworked the home-screen settings (row title, items in the row, titles blended, regenerate-on-refresh) to match the single-row model, and removed the cross-type toggle since the blended row already mixes media types via its sources. Fixed the Home Screen Sections plugin link in the docs.
+  Added a separate 'Discovery' control for the 'Recommended for You' home row, independent of the global Randomness used by Similar Items. Higher values both shuffle the row's ordering and progressively loosen the matching filters (genre/tag minimums and rating distances), so genuinely more distant titles can surface for broader discovery — without affecting Similar Items.

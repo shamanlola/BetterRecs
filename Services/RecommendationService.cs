@@ -187,6 +187,20 @@ public sealed class RecommendationService
         // The blended row already mixes media types through its different source
         // titles, so each source recommends only its own type (no movie→TV jumps).
         sectionConfig.SameMediaTypeOnly = true;
+
+        // The "Recommended for You" row gets its own discovery level, independent of
+        // the global Randomness that Similar Items uses. A single 0–100 knob drives two
+        // levers at once: the score-noise applied when ordering (so lower-ranked items
+        // can surface) AND a proportional loosening of the candidate filters (so the
+        // pool itself widens to genuinely more distant titles, not just a reshuffle of
+        // near-identical ones). At discovery 0 the row keeps the saved filters exactly.
+        var discovery = Math.Clamp(config.HomeSectionDiscovery, 0, 100);
+        var t = discovery / 100.0;
+        sectionConfig.Randomness                 = discovery;
+        sectionConfig.MinGenreMatches            = (int)Math.Round(config.MinGenreMatches * (1 - t), MidpointRounding.AwayFromZero);
+        sectionConfig.MinTagMatches              = (int)Math.Round(config.MinTagMatches * (1 - t), MidpointRounding.AwayFromZero);
+        sectionConfig.MaxCommunityRatingDistance = config.MaxCommunityRatingDistance + (float)t * (10f - config.MaxCommunityRatingDistance);
+        sectionConfig.MaxParentalRatingDistance  = config.MaxParentalRatingDistance + (int)Math.Round(t * (5 - config.MaxParentalRatingDistance), MidpointRounding.AwayFromZero);
         return sectionConfig;
     }
 

@@ -223,6 +223,17 @@
                             row surfaces things you haven't seen.
                         </div>
                     </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionDiscovery">Discovery (0–100)</label>
+                        <input id="inpHomeSectionDiscovery" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">
+                            How adventurous this row is, independent of the global Randomness used by
+                            "Similar Items". 0 = tight (your best matches, in order). Higher values both
+                            shuffle the order and loosen the matching filters, so genuinely more distant
+                            titles can appear. Tip: 30–60 for a livelier mix, 80+ for wide discovery.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ── Results ──────────────────────────────────────────── -->
@@ -346,6 +357,7 @@
             document.getElementById('inpRecentlyWatchedPoolSize').value         = config.RecentlyWatchedPoolSize;
             document.getElementById('chkHomeSectionShuffleSources').checked     = config.HomeSectionShuffleSources;
             document.getElementById('chkRecommendWatchedItems').checked         = config.RecommendWatchedItems;
+            document.getElementById('inpHomeSectionDiscovery').value            = config.HomeSectionDiscovery;
         }
 
         function collectConfig() {
@@ -378,6 +390,7 @@
                 RecentlyWatchedPoolSize:   parseInt(document.getElementById('inpRecentlyWatchedPoolSize').value, 10),
                 HomeSectionShuffleSources:     document.getElementById('chkHomeSectionShuffleSources').checked,
                 RecommendWatchedItems:         document.getElementById('chkRecommendWatchedItems').checked,
+                HomeSectionDiscovery:      parseInt(document.getElementById('inpHomeSectionDiscovery').value, 10),
             };
         }
 
