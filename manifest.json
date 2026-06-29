@@ -8,6 +8,14 @@
         "category": "General",
         "versions": [
             {
+                "version": "2.1.0.0",
+                "changelog": "Home Screen Sections (HSS) integration is now functional: BetterRecs registers a single blended 'Recommended for You' row that combines the top matches from several recently-watched titles and rebuilds on every home-screen refresh. Reworked the home-screen settings (row title, items in the row, titles blended, regenerate-on-refresh) to match the single-row model, and removed the cross-type toggle since the blended row already mixes media types via its sources. Fixed the Home Screen Sections plugin link in the docs.",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/shamanlola/BetterRecs/releases/download/v2.1.0/betterrecs/betterrecs_2.1.0.0.zip",
+                "checksum": "fd0505abd2e63b094cd20ef6f8a00ebf",
+                "timestamp": "2026-06-29T08:25:28Z"
+            },
+            {
                 "version": "2.0.0.0",
                 "changelog": "Renamed to BetterRecs. Added 'Because you watched ...' personalised recommendation sections, exposed via the /BetterRecs/Recommendations API, with full configuration (section count, items per section, recommend-watched, cross-type movie/series recommendations). Added Home Screen Sections (HSS) integration: when the HSS plugin is installed, BetterRecs registers a single blended 'Recommended for You' row on the home screen, combining matches from several recently-watched titles.",
                 "targetAbi": "10.11.0.0",
