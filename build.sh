@@ -10,7 +10,7 @@
 set -euo pipefail
 
 PLUGIN_NAME="BetterRecs"
-VERSION="2.0.0.0"
+VERSION="2.1.0.0"
 OUT_DIR="dist/${PLUGIN_NAME}"
 ZIP_NAME="${PLUGIN_NAME}_${VERSION}.zip"
 

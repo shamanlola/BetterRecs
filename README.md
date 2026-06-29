@@ -6,7 +6,7 @@
 
 BetterRecs replaces Jellyfin's built-in **Similar Items** with a multi-dimensional weighted scoring engine that matches on genres, tags, community rating, parental rating, release year, and cast/crew. It also exposes a **`/BetterRecs/Recommendations`** API that serves personalised *"Because you watched …"* rows per user.
 
-When the [Home Screen Sections (HSS)](https://github.com/nicknsy/jellyscrub) plugin is installed, BetterRecs automatically registers a blended **"Recommended for You"** row on the Jellyfin home screen, combining matches from several recently-watched titles.
+When the [Home Screen Sections (HSS)](https://github.com/IAmParadox27/jellyfin-plugin-home-sections) plugin is installed, BetterRecs automatically registers a blended **"Recommended for You"** row on the Jellyfin home screen, combining matches from several recently-watched titles.
 
 > **Requires:** Jellyfin 10.11 · .NET 9
 
@@ -16,9 +16,8 @@ When the [Home Screen Sections (HSS)](https://github.com/nicknsy/jellyscrub) plu
 
 - Drop-in replacement for the built-in Similar Items algorithm
 - Multi-dimensional weighted scoring (genres, tags, ratings, year, cast/crew)
-- Per-user personalised recommendation sections via REST API
-- Cross-type recommendations (movies ↔ series, configurable)
-- Optional home-screen row via HSS integration
+- Per-user personalised *"Because you watched …"* rows via REST API
+- Optional blended **"Recommended for You"** home-screen row via HSS integration, rebuilt on every refresh
 - Fully configurable through the Jellyfin dashboard
 
 ---
@@ -60,15 +59,19 @@ After installation, go to **Dashboard → Plugins → BetterRecs** to configure:
 
 - Enable/disable the plugin
 - Adjust similarity weights (genres, tags, rating, year, cast/crew)
-- Set the number of "Because you watched …" sections and items per section
-- Allow or block cross-type recommendations (movies ↔ series)
+- Configure the home-screen **"Recommended for You"** row: title, number of items, and how many recently-watched titles are blended into it
+- Toggle **Regenerate on each refresh** so the row re-picks its sources every time the home screen loads
 - Enable watched-item recommendations
 
 ---
 
 ## Home Screen Sections (HSS) Integration
 
-If the [Home Screen Sections](https://github.com/nicknsy/jellyscrub) plugin is also installed, BetterRecs will automatically register a single blended **"Recommended for You"** row on the home screen. No additional configuration is needed — the row appears after both plugins are installed and Jellyfin is restarted.
+If the [Home Screen Sections](https://github.com/IAmParadox27/jellyfin-plugin-home-sections) plugin is also installed, BetterRecs automatically registers a single blended **"Recommended for You"** row on the home screen. The row combines the top matches from several titles you recently watched, merged and interleaved into one list. Its contents are rebuilt on every request, so it refreshes along with the home screen (with **Regenerate on each refresh** enabled, it re-picks its source titles each time).
+
+BetterRecs registers the row with HSS via the plugin's supported reflection interface — there is no hard dependency, so BetterRecs loads fine whether or not HSS is present. Enable the section in HSS's home-screen settings after restarting Jellyfin.
+
+> **Note:** Like all HSS sections, this row only appears in the Jellyfin **Web UI** (and apps built on it). Native clients such as Swiftfin and Infuse won't show it — but the enhanced Similar Items still work everywhere.
 
 ---
 
@@ -89,8 +92,8 @@ Returns personalised *"Because you watched …"* sections for the current user. 
 Push a version tag to trigger the release workflow — it will build the plugin, create a GitHub Release, and attach the zip and checksums automatically:
 
 ```bash
-git tag v2.0.0
-git push origin v2.0.0
+git tag v2.1.0
+git push origin v2.1.0
 ```
 
 The release appears under the [Releases](https://github.com/shamanlola/BetterRecs/releases) tab once the workflow finishes.

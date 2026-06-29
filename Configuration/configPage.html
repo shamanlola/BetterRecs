@@ -142,60 +142,53 @@
                     </div>
                 </div>
 
-                <!-- ── "Because you watched …" home rows ────────────────── -->
+                <!-- ── "Recommended for you" home row ────────────────────── -->
                 <div class="verticalSection verticalSection-extrabottompadding">
                     <div class="sectionTitleContainer">
-                        <h2 class="sectionTitle">"Because you watched …" home rows</h2>
+                        <h2 class="sectionTitle">"Recommended for you" home row</h2>
                     </div>
                     <p class="fieldDescription">
-                        Personalised recommendation rows built from titles you recently watched, served
-                        from <code>GET /BetterRecs/Recommendations?userId=&lt;id&gt;</code>. Each row reuses
-                        the scoring engine configured above.
+                        A single personalised row for the home screen, blended from several titles you
+                        recently watched. Each source contributes its top matches (using the scoring engine
+                        configured above); the results are merged, de-duplicated and interleaved into one row.
                         <br /><br />
-                        To show these on the home screen, install the
-                        <strong>Home Screen Sections (HSS)</strong> plugin. BetterRecs registers a single
-                        blended row with HSS at startup, combining matches from several recently-watched
-                        titles under the heading set below. (The per-title "Number of rows" setting only
-                        applies to the raw API endpoint, which front-ends like KefinTweaks can also consume.)
+                        To show it, install the <strong>Home Screen Sections (HSS)</strong> plugin —
+                        BetterRecs registers the row with HSS at startup, then rebuilds its contents on every
+                        request, so it refreshes with the home screen. The same recommendations are also
+                        available raw at <code>GET /BetterRecs/Recommendations?userId=&lt;id&gt;</code> for
+                        front-ends such as KefinTweaks.
                     </p>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label">
                             <input id="chkHomeSectionsEnabled" type="checkbox" is="emby-checkbox" />
-                            <span>Enable "Because you watched …" rows</span>
+                            <span>Enable the "Recommended for you" row</span>
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">
-                            When off, the recommendations endpoint returns nothing and no row is registered with HSS.
+                            When off, no row is registered with HSS and the recommendations endpoint returns nothing.
                         </div>
                     </div>
 
                     <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionCount">Number of rows</label>
-                        <input id="inpHomeSectionCount" type="number" min="1" max="20" is="emby-input" />
-                        <div class="fieldDescription">How many "Because you watched X" rows to produce.</div>
-                    </div>
-
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionItemCount">Items per row</label>
-                        <input id="inpHomeSectionItemCount" type="number" min="1" max="50" is="emby-input" />
-                        <div class="fieldDescription">How many recommended items to show in each row.</div>
-                    </div>
-
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionTitle">Home-screen row title (HSS)</label>
+                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionTitle">Row title</label>
                         <input id="inpHomeSectionTitle" type="text" is="emby-input" />
                         <div class="fieldDescription">
-                            Heading for the blended row injected into the home screen via the Home Screen
-                            Sections plugin. Takes effect on the next server restart.
+                            Heading shown above the row on the home screen. Takes effect on the next server restart.
                         </div>
                     </div>
 
                     <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionBlendCount">Titles blended per home row (HSS)</label>
+                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionItemCount">Items in the row</label>
+                        <input id="inpHomeSectionItemCount" type="number" min="1" max="50" is="emby-input" />
+                        <div class="fieldDescription">How many recommended items to show in the row.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="inpHomeSectionBlendCount">Titles blended into the row</label>
                         <input id="inpHomeSectionBlendCount" type="number" min="1" max="50" is="emby-input" />
                         <div class="fieldDescription">
-                            How many recently-watched titles are combined into the single HSS home row.
-                            Each contributes its top matches; results are merged, de-duplicated and interleaved.
+                            How many recently-watched titles are combined into the row. Each contributes its
+                            top matches; results are merged, de-duplicated and interleaved.
                         </div>
                     </div>
 
@@ -203,19 +196,20 @@
                         <label class="inputLabel inputLabelUnfocused" for="inpRecentlyWatchedPoolSize">Recently-watched pool size</label>
                         <input id="inpRecentlyWatchedPoolSize" type="number" min="1" max="100" is="emby-input" />
                         <div class="fieldDescription">
-                            How many of your most recently played titles to draw the row sources from.
-                            A larger pool gives more variety when shuffling is enabled.
+                            How many of your most recently played titles the blend's sources are drawn from.
+                            A larger pool gives more variety when "Regenerate on each refresh" is enabled.
                         </div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label">
                             <input id="chkHomeSectionShuffleSources" type="checkbox" is="emby-checkbox" />
-                            <span>Rotate row sources</span>
+                            <span>Regenerate on each refresh</span>
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">
-                            Pick the source titles at random from the recent pool so the rows rotate over
-                            time. When off, your most recent titles are always used in order.
+                            Re-pick the blended source titles at random on every request, so the row changes
+                            each time the home screen refreshes. When off, your most recent titles are always
+                            used in order (the row stays stable).
                         </div>
                     </div>
 
@@ -225,19 +219,8 @@
                             <span>Recommend already-watched items</span>
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">
-                            Allow titles you've already played to appear inside the rows. Off by default so
-                            rows surface things you haven't seen.
-                        </div>
-                    </div>
-
-                    <div class="checkboxContainer checkboxContainer-withDescription">
-                        <label class="emby-checkbox-label">
-                            <input id="chkCrossTypeRecommendations" type="checkbox" is="emby-checkbox" />
-                            <span>Recommend across movies and TV</span>
-                        </label>
-                        <div class="fieldDescription checkboxFieldDescription">
-                            Let a movie's row include TV series and vice versa. When off, each row only
-                            contains the same media type as its source title.
+                            Allow titles you've already played to appear in the row. Off by default so the
+                            row surfaces things you haven't seen.
                         </div>
                     </div>
                 </div>
@@ -328,7 +311,13 @@
     (function () {
         var pluginId = 'd3a7e2b1-4c9f-4e8a-b5d6-2f1c8e3a7b9d';
 
+        // The full config loaded from the server. Saving merges the form fields over
+        // this so settings without a UI control (e.g. HomeSectionCount, which only
+        // governs the /BetterRecs/Recommendations API) keep their stored value.
+        var loadedConfig = {};
+
         function loadConfig(config) {
+            loadedConfig = config;
             document.getElementById('chkEnabled').checked                       = config.Enabled;
             document.getElementById('inpGenreWeight').value                     = config.GenreWeight;
             document.getElementById('inpTagWeight').value                       = config.TagWeight;
@@ -351,14 +340,12 @@
             document.getElementById('inpTopActorCount').value                   = config.TopActorCount;
             document.getElementById('inpIndexRefreshMinutes').value             = config.IndexRefreshMinutes;
             document.getElementById('chkHomeSectionsEnabled').checked           = config.HomeSectionsEnabled;
-            document.getElementById('inpHomeSectionCount').value                = config.HomeSectionCount;
             document.getElementById('inpHomeSectionItemCount').value            = config.HomeSectionItemCount;
             document.getElementById('inpHomeSectionTitle').value                = config.HomeSectionTitle;
             document.getElementById('inpHomeSectionBlendCount').value           = config.HomeSectionBlendCount;
             document.getElementById('inpRecentlyWatchedPoolSize').value         = config.RecentlyWatchedPoolSize;
             document.getElementById('chkHomeSectionShuffleSources').checked     = config.HomeSectionShuffleSources;
             document.getElementById('chkRecommendWatchedItems').checked         = config.RecommendWatchedItems;
-            document.getElementById('chkCrossTypeRecommendations').checked      = config.CrossTypeRecommendations;
         }
 
         function collectConfig() {
@@ -385,14 +372,12 @@
                 TopActorCount:             parseInt(document.getElementById('inpTopActorCount').value, 10),
                 IndexRefreshMinutes:       parseInt(document.getElementById('inpIndexRefreshMinutes').value, 10),
                 HomeSectionsEnabled:           document.getElementById('chkHomeSectionsEnabled').checked,
-                HomeSectionCount:          parseInt(document.getElementById('inpHomeSectionCount').value, 10),
                 HomeSectionItemCount:      parseInt(document.getElementById('inpHomeSectionItemCount').value, 10),
                 HomeSectionTitle:              document.getElementById('inpHomeSectionTitle').value,
                 HomeSectionBlendCount:     parseInt(document.getElementById('inpHomeSectionBlendCount').value, 10),
                 RecentlyWatchedPoolSize:   parseInt(document.getElementById('inpRecentlyWatchedPoolSize').value, 10),
                 HomeSectionShuffleSources:     document.getElementById('chkHomeSectionShuffleSources').checked,
                 RecommendWatchedItems:         document.getElementById('chkRecommendWatchedItems').checked,
-                CrossTypeRecommendations:      document.getElementById('chkCrossTypeRecommendations').checked,
             };
         }
 
@@ -406,7 +391,8 @@
             .addEventListener('submit', function (e) {
                 e.preventDefault();
                 Dashboard.showLoadingMsg();
-                ApiClient.updatePluginConfiguration(pluginId, collectConfig()).then(function () {
+                var merged = Object.assign({}, loadedConfig, collectConfig());
+                ApiClient.updatePluginConfiguration(pluginId, merged).then(function () {
                     Dashboard.processPluginConfigurationUpdateResult();
                 });
             });

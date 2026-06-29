@@ -63,19 +63,22 @@ public class PluginConfiguration : BasePluginConfiguration
     // bound on staleness. Minimum 1.
     public int IndexRefreshMinutes { get; set; } = 30;
 
-    // ── "Because you watched …" home-screen sections ────────────────────────────
-    // Master switch for the recommendation rows served from /BetterRecs/Recommendations.
+    // ── Home-screen recommendations ──────────────────────────────────────────────
+    // Master switch for the recommendation feature: the HSS home-screen row and the
+    // /BetterRecs/Recommendations API both honour this.
     public bool HomeSectionsEnabled { get; set; } = true;
 
-    // How many "Because you watched X" rows to produce in one response.
+    // How many per-title "Because you watched X" rows the /BetterRecs/Recommendations
+    // API returns in one response. This governs ONLY that raw API endpoint (consumed
+    // by front-ends such as KefinTweaks); the HSS integration always renders a single
+    // blended row, so this is not surfaced in the settings UI.
     public int HomeSectionCount { get; set; } = 3;
 
-    // How many recommended items to put in each row.
+    // How many recommended items to put in the row.
     public int HomeSectionItemCount { get; set; } = 12;
 
-    // Heading for the row injected into the home screen via the Home Screen Sections
-    // (HSS) plugin. That integration renders a single blended row, so it carries a
-    // static title rather than a per-source "Because you watched X" one.
+    // Heading for the single blended row injected into the home screen via the Home
+    // Screen Sections (HSS) plugin.
     public string HomeSectionTitle { get; set; } = "Recommended for You";
 
     // How many of the user's recently-played titles are blended together to build
@@ -84,23 +87,19 @@ public class PluginConfiguration : BasePluginConfiguration
     // user watched rather than just the most recent one.
     public int HomeSectionBlendCount { get; set; } = 5;
 
-    // The pool of most-recently-played items to draw the "X" source titles from.
-    // A few are picked (optionally at random — see HomeSectionShuffleSources) so the
-    // rows vary instead of always being the single most recent title.
+    // The pool of most-recently-played items to draw the blend's source titles from.
+    // Sources are picked from this pool (optionally at random — see
+    // HomeSectionShuffleSources) so the row reflects more than just the latest title.
     public int RecentlyWatchedPoolSize { get; set; } = 20;
 
-    // When true, the source titles are chosen at random from the recent pool, so the
-    // home screen rotates through different "Because you watched …" rows over time.
-    // When false, the most recently played titles are used in order.
+    // When true, the source titles are re-picked at random from the recent pool on
+    // every request, so the row is regenerated and changes on each home-screen refresh.
+    // When false, the most recently played titles are used in order (stable row).
     public bool HomeSectionShuffleSources { get; set; } = true;
 
-    // Whether already-watched items may appear *inside* the recommendation rows.
-    // Off by default — "Because you watched X" should surface things you haven't seen.
+    // Whether already-watched items may appear *inside* the recommendation row.
+    // Off by default — recommendations should surface things you haven't seen.
     public bool RecommendWatchedItems { get; set; } = false;
-
-    // Whether a movie source may recommend TV series (and vice versa) in its row.
-    // When false, each row only contains the same media type as its source title.
-    public bool CrossTypeRecommendations { get; set; } = false;
 
     // ── Feature flags ─────────────────────────────────────────────────────────
     public bool Enabled { get; set; } = true;

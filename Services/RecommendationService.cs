@@ -184,7 +184,9 @@ public sealed class RecommendationService
         sectionConfig.MaxResults        = Math.Max(1, config.HomeSectionItemCount);
         sectionConfig.MinResults        = Math.Min(config.MinResults, sectionConfig.MaxResults);
         sectionConfig.ExcludeWatched    = !config.RecommendWatchedItems;
-        sectionConfig.SameMediaTypeOnly = !config.CrossTypeRecommendations;
+        // The blended row already mixes media types through its different source
+        // titles, so each source recommends only its own type (no movie→TV jumps).
+        sectionConfig.SameMediaTypeOnly = true;
         return sectionConfig;
     }
 
@@ -194,7 +196,12 @@ public sealed class RecommendationService
     /// </summary>
     private IReadOnlyList<BaseItem> PickSourceItems(User user, PluginConfiguration config)
     {
-        var poolSize = Math.Max(config.HomeSectionCount, config.RecentlyWatchedPoolSize);
+        // Big enough to satisfy whichever consumer asks for the most sources: the
+        // per-title API rows (HomeSectionCount) or the blended row (HomeSectionBlendCount),
+        // while still honouring the configured recently-watched pool for variety.
+        var poolSize = Math.Max(
+            Math.Max(config.HomeSectionCount, config.HomeSectionBlendCount),
+            config.RecentlyWatchedPoolSize);
 
         var query = new InternalItemsQuery(user)
         {
