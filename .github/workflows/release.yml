@@ -69,6 +69,10 @@ jobs:
             --url "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/" \
             . "$ZIPNAME"
           rm "$ZIPNAME"
+          # jprm inserts a "<plugin-slug>/" subdirectory into sourceUrl, but GitHub
+          # release assets are flat (releases/download/<tag>/<file>). Strip that extra
+          # path segment so Jellyfin can actually download the update.
+          sed -i -E 's#(releases/download/[^/]+/)[^/"]+/([^/"]+\.zip)#\1\2#g' manifest.json
 
       - name: Commit Manifest
         run: |
